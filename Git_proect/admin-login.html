@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход для администратора | СибГИУ</title>
+    <link rel="stylesheet" href="new.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-placeholder">СиБГИУ</div>
+                <div class="logo-text">
+                    <div class="project-name">Панель администратора</div>
+                </div>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="btn-secondary nav-btn">На главную</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <div class="logo-admin">🔐</div>
+                <h2>Вход в систему</h2>
+                <p>Доступ только для авторизованного персонала</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Логин</label>
+                    <input type="text" class="form-input" placeholder="Введите логин" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Пароль</label>
+                    <input type="password" class="form-input" placeholder="Введите пароль" required>
+                </div>
+
+                <button type="submit" class="login-btn">Войти</button>
+            </form>
+
+            <div class="admin-features">
+                <h3>Возможности панели управления:</h3>
+                <ul class="feature-list">
+                    <li>Создание и редактирование опросов</li>
+                    <li>Конструктор вопросов разных типов</li>
+                    <li>Просмотр статистики ответов</li>
+                    <li>Управление сроками опросов</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="copyright">
+            <p>&copy; 2024 Сибирский государственный индустриальный университет | Панель администратора</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Простая проверка - в реальной системе будет подключение к бэкенду
+            const login = this.querySelector('input[type="text"]').value;
+            const password = this.querySelector('input[type="password"]').value;
+            
+            if (login && password) {
+                // Успешный вход - переходим в админ-панель
+                window.location.href = "admin-dashbord.html";
+            } else {
+                alert('Пожалуйста, заполните все поля');
+            }
+        });
+    </script>
+</body>
+</html>

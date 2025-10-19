@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора | СибГИУ</title>
+    <link rel="stylesheet" href="new.css">
+    
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-placeholder">СГИУ</div>
+                <div class="logo-text">
+                    <div class="university-name">Сибирский государственный индустриальный университет</div>
+                    <div class="project-name">Панель администратора</div>
+                </div>
+            </div>
+            <nav class="nav">
+                <span style="color: var(--white);">Администратор</span>
+                <a href="index.html" class="btn-secondary nav-btn">На сайт</a>
+                <a href="#" id="logoutBtn" class="btn-secondary nav-btn">Выйти</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Основной контент админки -->
+    <main class="admin-container">
+        <div class="admin-header">
+            <h1>Управление опросами</h1>
+            <button class="btn" onclick="showSection('create-poll')">+ Создать опрос</button>
+        </div>
+
+        <!-- Навигация -->
+        <div class="admin-nav">
+            <button class="admin-nav-btn active" onclick="showSection('dashboard')">Дашборд</button>
+            <button class="admin-nav-btn" onclick="showSection('polls')">Все опросы</button>
+            <button class="admin-nav-btn" onclick="showSection('create-poll')">Создать опрос</button>
+            <button class="admin-nav-btn" onclick="showSection('statistics')">Статистика</button>
+        </div>
+
+        <!-- Дашборд -->
+        <section id="dashboard" class="admin-section active">
+            <h2>Общая статистика</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">12</div>
+                    <div>Активных опросов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">1,247</div>
+                    <div>Всего ответов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">84%</div>
+                    <div>Завершено опросов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">15</div>
+                    <div>Новых ответов</div>
+                </div>
+            </div>
+
+            <h3>Последние опросы</h3>
+            <div class="polls-list">
+                <div class="poll-item">
+                    <div>
+                        <strong>Удовлетворенность качеством образования</strong>
+                        <div>📊 245 ответов • Активен до 25.12.2024</div>
+                    </div>
+                    <div class="poll-actions">
+                        <button class="btn btn-small">Статистика</button>
+                        <button class="btn btn-secondary btn-small">Редактировать</button>
+                    </div>
+                </div>
+                <div class="poll-item">
+                    <div>
+                        <strong>Оценка библиотечных услуг</strong>
+                        <div>📊 189 ответов • Завершен</div>
+                    </div>
+                    <div class="poll-actions">
+                        <button class="btn btn-small">Статистика</button>
+                        <button class="btn btn-secondary btn-small">Редактировать</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Все опросы -->
+        <section id="polls" class="admin-section">
+            <h2>Все опросы</h2>
+            <div class="polls-list">
+                <!-- Опросы будут добавляться динамически -->
+            </div>
+        </section>
+
+        <!-- Создание опроса -->
+        <section id="create-poll" class="admin-section">
+            <h2>Создание нового опроса</h2>
+            <form id="pollForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Название опроса *</label>
+                        <input type="text" class="form-input" id="pollTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Дедлайн</label>
+                        <input type="date" class="form-input" id="pollDeadline">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Описание опроса</label>
+                    <textarea class="form-input" id="pollDescription" rows="3"></textarea>
+                </div>
+
+                <h3>Вопросы</h3>
+                <div id="questionsList" class="questions-list">
+                    <!-- Вопросы будут добавляться здесь -->
+                </div>
+
+                <button type="button" class="btn btn-secondary" onclick="addQuestion()">+ Добавить вопрос</button>
+
+                <div class="poll-navigation" style="margin-top: 2rem;">
+                    <button type="button" class="btn-secondary" onclick="showSection('dashboard')">Отмена</button>
+                    <button type="submit" class="btn">Создать опрос</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Статистика -->
+        <section id="statistics" class="admin-section">
+            <h2>Статистика ответов</h2>
+            <div class="form-group">
+                <label class="form-label">Выберите опрос для просмотра статистики</label>
+                <select class="form-input" id="pollSelect">
+                    <option value="">-- Выберите опрос --</option>
+                </select>
+            </div>
+            <div id="pollStats">
+                <!-- Статистика будет отображаться здесь -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Подвал -->
+    <footer class="footer">
+        <div class="copyright">
+            <p>&copy; 2024 Сибирский государственный индустриальный университет | Панель администратора</p>
+        </div>
+    </footer>
+
+    <script>
+        // Хранение данных
+        let polls = JSON.parse(localStorage.getItem('polls')) || [];
+        let currentQuestions = [];
+
+        // Навигация по разделам
+        function showSection(sectionId) {
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.admin-nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Добавление вопроса
+        function addQuestion() {
+            const questionId = 'q' + Date.now();
+            const questionHTML = `
+                <div class="question-item" id="${questionId}">
+                    <div class="question-header">
+                        <strong>Новый вопрос</strong>
+                        <button type="button" class="btn-danger btn-small" onclick="removeQuestion('${questionId}')">Удалить</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Текст вопроса *</label>
+                        <input type="text" class="form-input" name="questionText" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Тип вопроса *</label>
+                        <select class="form-input" name="questionType" onchange="changeQuestionType('${questionId}', this.value)">
+                            <option value="single">Одиночный выбор</option>
+                            <option value="multiple">Множественный выбор</option>
+                            <option value="scale">Шкала (1-5)</option>
+                            <option value="text">Текстовый ответ</option>
+                        </select>
+                    </div>
+                    <div class="options-list" id="options-${questionId}">
+                        <div class="option-item">
+                            <input type="text" class="form-input" placeholder="Вариант ответа" name="option">
+                            <button type="button" class="btn-danger btn-small" onclick="removeOption(this)">×</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-secondary btn-small" onclick="addOption('${questionId}')">+ Добавить вариант</button>
+                </div>
+            `;
+            document.getElementById('questionsList').insertAdjacentHTML('beforeend', questionHTML);
+        }
+
+        // Изменение типа вопроса
+        function changeQuestionType(questionId, type) {
+            const optionsDiv = document.getElementById('options-' + questionId);
+            if (type === 'text' || type === 'scale') {
+                optionsDiv.innerHTML = '';
+                if (type === 'scale') {
+                    optionsDiv.innerHTML = `
+                        <div class="option-item">Автоматическая шкала от 1 до 5</div>
+                    `;
+                }
+            } else {
+                optionsDiv.innerHTML = `
+                    <div class="option-item">
+                        <input type="text" class="form-input" placeholder="Вариант ответа" name="option">
+                        <button type="button" class="btn-danger btn-small" onclick="removeOption(this)">×</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Добавление варианта ответа
+        function addOption(questionId) {
+            const optionsDiv = document.getElementById('options-' + questionId);
+            const optionHTML = `
+                <div class="option-item">
+                    <input type="text" class="form-input" placeholder="Вариант ответа" name="option">
+                    <button type="button" class="btn-danger btn-small" onclick="removeOption(this)">×</button>
+                </div>
+            `;
+            optionsDiv.insertAdjacentHTML('beforeend', optionHTML);
+        }
+
+        // Удаление варианта ответа
+        function removeOption(button) {
+            button.parentElement.remove();
+        }
+
+        // Удаление вопроса
+        function removeQuestion(questionId) {
+            document.getElementById(questionId).remove();
+        }
+
+        // Создание опроса
+        document.getElementById('pollForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const poll = {
+                id: 'poll' + Date.now(),
+                title: document.getElementById('pollTitle').value,
+                description: document.getElementById('pollDescription').value,
+                deadline: document.getElementById('pollDeadline').value,
+                created: new Date().toISOString(),
+                questions: []
+            };
+
+            // Сбор вопросов
+            document.querySelectorAll('.question-item').forEach(questionElem => {
+                const question = {
+                    text: questionElem.querySelector('[name="questionText"]').value,
+                    type: questionElem.querySelector('[name="questionType"]').value,
+                    options: []
+                };
+
+                // Сбор вариантов ответов
+                if (question.type !== 'text' && question.type !== 'scale') {
+                    questionElem.querySelectorAll('[name="option"]').forEach(optionInput => {
+                        if (optionInput.value.trim()) {
+                            question.options.push(optionInput.value.trim());
+                        }
+                    });
+                } else if (question.type === 'scale') {
+                    question.options = ['1', '2', '3', '4', '5'];
+                }
+
+                poll.questions.push(question);
+            });
+
+            polls.push(poll);
+            localStorage.setItem('polls', JSON.stringify(polls));
+            
+            alert('Опрос успешно создан!');
+            showSection('dashboard');
+            this.reset();
+            document.getElementById('questionsList').innerHTML = '';
+        });
+
+        // Выход из системы
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Вы уверены, что хотите выйти?')) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Загрузка опросов при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePollsList();
+        });
+
+        function updatePollsList() {
+            const pollsList = document.querySelector('#polls .polls-list');
+            pollsList.innerHTML = '';
+            
+            polls.forEach(poll => {
+                const pollHTML = `
+                    <div class="poll-item">
+                        <div>
+                            <strong>${poll.title}</strong>
+                            <div>📊 ${poll.questions.length} вопросов • Создан ${new Date(poll.created).toLocaleDateString()}</div>
+                        </div>
+                        <div class="poll-actions">
+                            <button class="btn btn-small" onclick="viewPoll('${poll.id}')">Просмотр</button>
+                            <button class="btn btn-secondary btn-small" onclick="editPoll('${poll.id}')">Редактировать</button>
+                            <button class="btn btn-danger btn-small" onclick="deletePoll('${poll.id}')">Удалить</button>
+                        </div>
+                    </div>
+                `;
+                pollsList.insertAdjacentHTML('beforeend', pollHTML);
+            });
+        }
+
+        function viewPoll(pollId) {
+            const poll = polls.find(p => p.id === pollId);
+            if (poll) {
+                alert(`Просмотр опроса: ${poll.title}\nВопросов: ${poll.questions.length}`);
+            }
+        }
+
+        function editPoll(pollId) {
+            alert('Редактирование опроса ' + pollId);
+            // Реализация редактирования
+        }
+
+        function deletePoll(pollId) {
+            if (confirm('Вы уверены, что хотите удалить этот опрос?')) {
+                polls = polls.filter(p => p.id !== pollId);
+                localStorage.setItem('polls', JSON.stringify(polls));
+                updatePollsList();
+            }
+        }
+    </script>
+</body>
+</html>
