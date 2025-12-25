@@ -312,7 +312,7 @@
                     <div class="poll-item">
                         <div>
                             <strong>${poll.title}</strong>
-                            <div>📊 ${poll.questions.length} вопросов • Создан ${new Date(poll.created).toLocaleDateString()}</div>
+                            <div> ${poll.questions.length} вопросов • Создан ${new Date(poll.created).toLocaleDateString()}</div>
                         </div>
                         <div class="poll-actions">
                             <button class="btn btn-small" onclick="viewPoll('${poll.id}')">Просмотр</button>
@@ -346,4 +346,5 @@
         }
     </script>
 </body>
+
 </html>
